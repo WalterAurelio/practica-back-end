@@ -11,6 +11,7 @@ const employeesRouter = require('./routes/api/employees');
 const registerRouter = require('./routes/register.routes');
 const authRouter = require('./routes/auth.routes');
 const refreshRouter = require('./routes/refresh.routes');
+const logoutRouter = require('./routes/logout.routes');
 
 // Connect to MongoDB
 connectDB();
@@ -31,6 +32,7 @@ app.use('/employees', employeesRouter);
 app.use('/', registerRouter);
 app.use('/', authRouter);
 app.use('/', refreshRouter);
+app.use('/', logoutRouter);
 
 mongoose.connection.once('open', () => {
   console.log('Conectado exitósamente a MongoDB!');
