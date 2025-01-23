@@ -16,8 +16,12 @@ const handleRefreshToken = async (req, res) => {
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
     if (err || foundUser.username !== decoded.username) return res.status(403).json({ message: 'El token está vencido o no coinciden los username' });
     // Si es válido el refresh token, emitimos un nuevo access token
+    const roles = Object.values(foundUser.roles);
     const accessToken = jwt.sign(
-      { username: foundUser.username },
+      {
+        username: foundUser.username,
+        roles
+      },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: '40s' }
     );

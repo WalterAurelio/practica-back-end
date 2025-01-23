@@ -17,8 +17,12 @@ const authUser = async (req, res) => {
   if (!validPassword) return res.status(400).json({ message: 'Contraseña incorrecta.' });
 
   // Si coinciden usuario y contraseña, genero los access token y refresh token para el usuario
+  const roles = Object.values(foundUser.roles); // Object.values() retorna un arreglo de valores; estos valores son los que tienen las propiedades del objeto que reciba como Object.values() como argumento
   const accessToken = jwt.sign(
-    { username: foundUser.username },
+    {
+      username: foundUser.username,
+      roles
+    },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: '40s' }
   );

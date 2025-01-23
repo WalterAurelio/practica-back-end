@@ -12,6 +12,7 @@ const registerRouter = require('./routes/register.routes');
 const authRouter = require('./routes/auth.routes');
 const refreshRouter = require('./routes/refresh.routes');
 const logoutRouter = require('./routes/logout.routes');
+const verifyJWT = require('./middlewares/verifyJWT');
 
 // Connect to MongoDB
 connectDB();
@@ -28,11 +29,15 @@ app.use(express.json());
 // Middleware for cookies
 app.use(cookieParser());
 
-app.use('/employees', employeesRouter);
 app.use('/', registerRouter);
 app.use('/', authRouter);
 app.use('/', refreshRouter);
 app.use('/', logoutRouter);
+
+// Usamos nuestro middleware para autenticar la JWT (SIEMPRE DESPUÉS DE LAS RUTAS DE AUTENTICACIÓN; DE LO CONTRARIO, NADIE PODRÍA ACCEDER A REGISTRARSE O INICIAR SESIÓN)
+app.use(verifyJWT);
+
+app.use('/employees', employeesRouter);
 
 mongoose.connection.once('open', () => {
   console.log('Conectado exitósamente a MongoDB!');
