@@ -2,6 +2,26 @@ const User = require('../model/User');
 const jwt = require('jsonwebtoken');
 
 const handleLogout = async (req, res) => {
+  const cookie = req.cookies;
+
+  if (!cookie?.jwt) return res.sendStatus(204);
+  
+  const refreshToken = cookie.jwt;
+  const foundUser = await User.findOne({ refreshToken });
+  if (!foundUser) {
+    res.clearCookie('jwt', { httpOnly: true, sameSite: 'None' });
+    return res.sendStatus(204);
+  }
+
+  foundUser.refreshToken = foundUser.refreshToken.filter(rt => rt !== refreshToken);
+  const result = await foundUser.save();
+  console.log('Soy result de logout: ', result);
+
+  res.clearCookie('jwt', { httpOnly: true, sameSite: 'None' });
+  res.sendStatus(204);
+};
+
+/* const handleLogout = async (req, res) => {
   const cookies = req.cookies;
 
   // Verifico si existe la cookie jwt en la petición; si no existe, simplemente retorno Success, but no content;
@@ -16,11 +36,11 @@ const handleLogout = async (req, res) => {
   }
 
   // Si se encontró un usuario con ese refresh token, eliminamos ese refresh token del usuario en la BD (sin importar si el refresh token recibido está vencido o no); también debemos limpiar la cookie que nos llegó en la petición y retornamos 204 Success, but no content
-  foundUser.refreshToken = '';
+  foundUser.refreshToken = foundUser.refreshToken.filter(rt => rt !== refreshToken);
   const result = await foundUser.save();
   console.log(result);
   res.clearCookie('jwt', { httpOnly: true, sameSite: 'None' });
   res.sendStatus(204);
-}
+} */
 
 module.exports = handleLogout;
